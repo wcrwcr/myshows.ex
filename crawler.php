@@ -113,9 +113,10 @@ if (!empty ($links)) {
 	cliOut("nothing to retrieve.");
 }
 
+$date = date("d.m.y.H.i.s");
 
 if (!empty($notLinks)) {
-	dumpIncremental(implode(PHP_EOL, $notLinks), '_#didntRetrieved.log');	
+	dumpIncremental(implode(PHP_EOL, $notLinks), $SETTINGS['logPath'].$date.'_#didntRetrieved.log');	
 	echo PHP_EOL."some of the serials was found but cant retrieve links, check _#didntRetrieved.log.".PHP_EOL;
 }
 
@@ -123,6 +124,5 @@ $log = ob_get_contents();
 ob_end_clean();
 
 //echo pr($es);
-$date = date("d.m.y.H.i.s");
 dump($results, $SETTINGS['logPath'].$date.'.debug'.'.log');
 dump($log, $SETTINGS['logPath'].$date.'.run'.'.log');
