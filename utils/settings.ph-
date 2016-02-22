@@ -1,0 +1,12 @@
+<?php
+$SETTINGS = array(
+		'login'=>'', //myshows login
+		'password' => '', //myshows password
+		'translateLag' => 1, // how many days wait (translate and share lag)
+		'searchString' => 'http://www.ex.ua/search?s=',
+		'getString' => 'http://www.ex.ua',
+		'wgetPath' => "d:\\wget\\bin\\", //local wget path. if system allows global `wget` command leave blank
+		'storagePath' => "d:\\_crawled\\", //where media files will appear
+		'logPath' => "d:\\_crawled\\logs\\", //where logs will appear
+
+);
