@@ -1,0 +1,8 @@
+on win: 
+1. change settings.ph-
+2. create _crawler.cmd
+3. cron add command: schtasks /create /sc HOURLY /mo 2 /tn "MyShows Crawl" /tr d:\_crawler.cmd
+
+on *nix: 
+1. change settings.ph-
+2. setup crontab with crawler.php
