@@ -116,7 +116,7 @@ if (!empty ($links)) {
 $date = date("d.m.y.H.i.s");
 
 if (!empty($notLinks)) {
-	dumpIncremental(implode(PHP_EOL, $notLinks), $SETTINGS['logPath'].$date.'_#didntRetrieved.log');	
+	dump(implode(PHP_EOL, $notLinks), $SETTINGS['logPath'].$date.'_#didntRetrieved.log');	
 	echo PHP_EOL."some of the serials was found but cant retrieve links, check _#didntRetrieved.log.".PHP_EOL;
 }
 

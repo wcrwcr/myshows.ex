@@ -148,6 +148,7 @@ class ranker {
             'baibak & ko' => $this->baseRank,
             'baibak&ko' => $this->baseRank,
             'baibako' => $this->baseRank,
+        	'ozz.tv'=> $this->baseRank,
             'alexfim' => $this->baseRank,
             'sienduk' => $this->baseRank*0.9,
             'amedia' => $this->baseRank*0.7,
