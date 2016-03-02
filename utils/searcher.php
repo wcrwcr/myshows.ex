@@ -81,7 +81,17 @@ class searcher {
         
         $this->searchString = implode(' ', $ss);
         $searchString = urlencode($this->searchString);
-        $html = file_get_html('http://www.ex.ua/search?s='.$searchString);
+        
+        overloadErrors ();
+        try {
+            $url2Load = 'http://www.ex.ua/search?s='.$searchString;
+            $html = file_get_html($url2Load);
+        } catch (Exception $e) {
+            echo PHP_EOL."failed to load: {$url2Load}.".PHP_EOL;
+            return null;
+        }
+        overloadErrors (false);
+        
         if (is_object($html)) {
         	$links = $html->find('table.panel td a');
 		    $looker = ($ru)? $this->name : $this->nameEng ;

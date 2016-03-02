@@ -29,3 +29,18 @@ function execInBackground($cmd) {
 		exec($cmd . " > /dev/null &");
 	}
 }
+
+function overloadErrors ($enable = true, $excName = 'Exception') {
+    //back to default handler
+    restore_error_handler();
+    if ($enable) {
+        set_error_handler(function($errno, $errstr, $errfile, $errline, array $errcontext) {
+            // error was suppressed with the @-operator
+            if (0 === error_reporting()) {
+                return false;
+            }
+        
+            throw new $excName ($errstr, 0, $errno, $errfile, $errline);
+        });
+    }
+}
