@@ -68,7 +68,7 @@ class searcher {
         } else {
             $ss[]= mb_strtolower($this->nameEng, 'UTF-8');
         }
-
+        
         $ss[]= "сезон {$this->season}";
         
         if ($series) {
@@ -80,6 +80,11 @@ class searcher {
         }
         
         $this->searchString = implode(' ', $ss);
+        
+        //strip the specials
+        $this->searchString = str_replace("'", '', $this->searchString);
+        $this->searchString = str_replace(".", ' ', $this->searchString);
+        
         $searchString = urlencode($this->searchString);
         
         overloadErrors ();
@@ -96,8 +101,10 @@ class searcher {
         	$links = $html->find('table.panel td a');
 		    $looker = ($ru)? $this->name : $this->nameEng ;
 		    
+		    		    
         	if (is_array($links) && !empty($links)) {
 		        foreach ($links as $el) {
+		            
 		        	$text = $el->plaintext;
 		        	if (mb_stripos($text, $looker, 0, 'UTF-8') !== false) {
 			            $this->urls[] = array(
@@ -106,6 +113,7 @@ class searcher {
 			            );
 		        	}
 		        }
+		        
 		        if (!empty($this->urls)) {
 			        $tmp = new ranker($this); 
 		        	return $tmp->rankAll();

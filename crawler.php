@@ -67,16 +67,27 @@ foreach ($list as $key => &$item) {
 
     	foreach (array(true, false) as $series) {
     		foreach (array(true, false) as $ru) {
-    			foreach (array(true, false) as $last) {
-    				echo '.';
-    				$params = array($ru, $last, $series);
-    				$found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
-    				if (!is_null($found)) {
-      						
-    					break;
-    				}
-    				
-    			}
+    		    if ($series) {
+        			foreach (array(true, false) as $last) {
+        				echo '.';
+        				$params = array($ru, $last, $series);
+        				$found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
+        				if (!is_null($found)) {
+          						
+        					break;
+        				}
+        				
+        			}
+    		    } else {
+    		        $last = 0;
+    		        echo '.';
+    		        $params = array($ru, $last, $series);
+    		        $found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
+    		        if (!is_null($found)) {
+    		        
+    		            break;
+    		        }
+    		    }
     		}
     	}
     
