@@ -86,6 +86,7 @@ class searcher {
         $this->searchString = str_replace(".", ' ', $this->searchString);
         
         $searchString = urlencode($this->searchString);
+        dumpIncremental("lookfor {$this->searchString} with {$this->schema}", '_#ranklogPromoted.log');
         
         overloadErrors ();
         try {

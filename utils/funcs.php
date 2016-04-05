@@ -9,10 +9,12 @@ function pr($i) {
 }
 
 function dump($i, $file='__test') {
+    $file = LOGPATH.DATE.$file;
     file_put_contents($file, pr($i));
 }
 
 function dumpIncremental($i, $file='__test') {
+    $file = LOGPATH.DATE.$file;
 	$str = file_get_contents($file);
 	$str .= PHP_EOL.$i; 
 	file_put_contents($file, $str);

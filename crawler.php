@@ -6,6 +6,8 @@ define('LOG', true);
 require_once 'vendors/Loader.php';
 require_once 'utils/Loader.php';
 
+define ('LOGPATH', $SETTINGS['logPath']);
+
 if (LOG) {
     ob_start();
 }
@@ -72,8 +74,10 @@ foreach ($list as $key => &$item) {
         				echo '.';
         				$params = array($ru, $last, $series);
         				$found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
+        				
         				if (!is_null($found)) {
-          						
+        				    dumpIncremental("got urls".var_export($found, 1), '_#ranklogPromoted.log');
+        				    
         					break;
         				}
         				
@@ -84,7 +88,8 @@ foreach ($list as $key => &$item) {
     		        $params = array($ru, $last, $series);
     		        $found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
     		        if (!is_null($found)) {
-    		        
+    		            dumpIncremental("got urls".var_export($found, 1), '_#ranklogPromoted.log');
+    		            
     		            break;
     		        }
     		    }
@@ -133,15 +138,15 @@ if (!empty ($links)) {
 
 
 if (!empty($notLinks)) {
-	dump(implode(PHP_EOL, $notLinks), $SETTINGS['logPath'].DATE.'_#didntRetrieved.log');	
+	dump(implode(PHP_EOL, $notLinks), '_#didntRetrieved.log');	
 	echo PHP_EOL."some of the serials was found but cant retrieve links, check _#didntRetrieved.log.".PHP_EOL;
 }
 
 if (LOG) {
     $log = ob_get_contents();
     ob_end_clean();
-    dump($log, $SETTINGS['logPath'].DATE.'.run'.'.log');
+    dump($log, '.run'.'.log');
 }
 
 //echo pr($es);
-dump($results, $SETTINGS['logPath'].DATE.'.debug'.'.log');
+dump($results, '.debug'.'.log');

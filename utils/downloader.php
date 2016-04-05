@@ -47,7 +47,7 @@ class dmaster {
     public function command($link) {
         
         $command = "{$this->options['dmasterPath']}dmaster.exe {$this->options['getString']}{$link} hidden=1 start=1";
-        dumpIncremental($command, $this->options['logPath'].DATE.'_linksDebug.log');
+        dumpIncremental($command, $this->options['logPath'].'_linksDebug.log');
         sleep(5);
         return $command;
     }
