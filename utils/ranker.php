@@ -57,11 +57,11 @@ class ranker {
     private function rankName($url) {
         $rank = 0;
         
-        if (false !== mb_stripos($url , $this->links->name, 0, 'UTF-8')){
+        if (false !== mb_stripos($url, stripSS($this->links->name), 0, 'UTF-8')){
             $rank += 50;
         }
         
-        if(false !== mb_stripos($url , $this->links->nameEng, 0, 'UTF-8')) {
+        if(false !== mb_stripos($url, stripSS($this->links->nameEng), 0, 'UTF-8')) {
             $rank += 50;
         }
         return $rank;
@@ -112,17 +112,17 @@ class ranker {
     				if(false !== mb_stripos($url , $prePattern, 0, 'UTF-8')) {
     					if(false !== mb_stripos($url , $prePattern.$this->links->episodeLast, 0, 'UTF-8')) {
     					    dumpIncremental("{$this->links->name} for url:{$url} ranked by pre pattern {$prePattern} + {$this->links->episodeLast}", '_#ranklogSeries.log');
-    					    return $this->baseRank*2;
+    					    return $this->baseRank;
     					}elseif(false !== mb_stripos($url , $prePattern.$this->links->episodeFirst, 0, 'UTF-8')) {
     					    dumpIncremental("{$this->links->name} for url:{$url} ranked by pre pattern {$prePattern} + {$this->links->episodeFirst}", '_#ranklogSeries.log');
-    						return $this->baseRank*2;
+    						return $this->baseRank;
     					}else {
     						preg_match('/('.$prePattern.'[?<digit>\d+]*)/', $url, $matches);
     						$dd = array_map('trim', explode('-',$matches[0]));
     						$lastnum = intval($dd[0]);
     						if($lastnum >= $this->links->episodeLast) {
     						    dumpIncremental("{$this->links->name} for url:{$url} ranked by preg lastnum:{$lastnum} >= {$this->links->episodeLast}", '_#ranklogSeries.log');    						
-    						    return $this->baseRank*2;
+    						    return $this->baseRank;
     						}
     						if($lastnum >= $this->links->episodeFirst) {
     						    dumpIncremental("{$this->links->name} for url:{$url} ranked by preg lastnum:{$lastnum} >= {$this->links->episodeFirst}", '_#ranklogSeries.log');

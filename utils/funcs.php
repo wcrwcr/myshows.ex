@@ -46,3 +46,28 @@ function overloadErrors ($enable = true, $excName = 'Exception') {
         });
     }
 }
+
+if (!function_exists("mb_str_replace"))
+{
+    function mb_str_replace($needle, $replacement, $haystack) {
+        return implode($replacement, mb_split($needle, $haystack));
+    }
+    
+}
+
+function stripSS($text) {
+
+    //marvel's || dc's - this kind of shit
+    $textStriped = explode(' ', $text);
+    if (mb_stripos($textStriped[0], "'", 0, 'UTF-8') !== false) {
+        unset($textStriped[0]);
+    }
+
+    $text = implode(' ', $textStriped);
+
+    //Агенты «Щ.И.Т.»
+    $text = mb_str_replace("»", "", $text);
+    $text = mb_str_replace("«", "", $text);
+
+    return $text;
+}

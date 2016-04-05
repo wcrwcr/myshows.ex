@@ -55,6 +55,11 @@ class searcher {
         return $this;
     }
     
+    //strips all unusual occurencies in Myshows names
+    private function stripSS($text) {
+        return stripSS($text);
+    }
+    
     public function search ($ru = true, $last = true, $series = true) {
         $ss = array();
         
@@ -102,12 +107,15 @@ class searcher {
         	$links = $html->find('table.panel td a');
 		    $looker = ($ru)? $this->name : $this->nameEng ;
 		    
+		    $looker = $this->stripSS($looker);
 		    		    
         	if (is_array($links) && !empty($links)) {
 		        foreach ($links as $el) {
-		            
 		        	$text = $el->plaintext;
+		            
+		        	dumpIncremental("look text {$text} for {$looker}", $this->schema.'_#linksLooker.log');
 		        	if (mb_stripos($text, $looker, 0, 'UTF-8') !== false) {
+		        	    dumpIncremental("got", $this->schema.'_#linksLooker.log');
 			            $this->urls[] = array(
 			                'href' => $el->href,
 			                'text' => mb_strtolower($el->plaintext, 'UTF-8')
