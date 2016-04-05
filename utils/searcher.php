@@ -69,9 +69,9 @@ class searcher {
         $this->schema .= intval($last);
         
         if ($ru) {
-            $ss[]= mb_strtolower($this->name, 'UTF-8');
+            $ss[]= mb_strtolower(stripSS($this->name), 'UTF-8');
         } else {
-            $ss[]= mb_strtolower($this->nameEng, 'UTF-8');
+            $ss[]= mb_strtolower(stripSS($this->nameEng), 'UTF-8');
         }
         
         $ss[]= "сезон {$this->season}";
@@ -111,7 +111,7 @@ class searcher {
 		    		    
         	if (is_array($links) && !empty($links)) {
 		        foreach ($links as $el) {
-		        	$text = $el->plaintext;
+		        	$text = decodeSpecials($el->plaintext);
 		            
 		        	dumpIncremental("look text {$text} for {$looker}", $this->schema.'_#linksLooker.log');
 		        	if (mb_stripos($text, $looker, 0, 'UTF-8') !== false) {

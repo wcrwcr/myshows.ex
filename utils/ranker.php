@@ -25,14 +25,19 @@ class ranker {
             $rank = 0;
             $ranked = array();
             foreach (array('Name', 'Season', 'Episode', 'Weight', 'Studio') as $method) {
-            	$rt = call_user_func_array(array($this, "rank{$method}"), array($url['text']));
+            	$rt = call_user_func_array(array($this, "rank{$method}"), array(decodeSpecials(mb_strtolower(stripSS($url['text']), 'UTF-8'))));
             	$rank += $rt;
             	$ranked[$method] = $rt;
             }
             $ranked['total'] = $rank;
 
             //set Ranked.Episode and Ranked.Season most important
-            if ($rank > $max && $ranked['Episode'] > 0 && $ranked['Season'] > 0) {
+            if (
+                $rank > $max && 
+                $ranked['Episode'] > 0 && 
+                $ranked['Season'] > 0 &&
+                $ranked['Name'] > 10
+        	) {
                 $max = $rank;
                 $maxRanked = $ranked;
                 $this->res = $key; 
@@ -56,14 +61,16 @@ class ranker {
     
     private function rankName($url) {
         $rank = 0;
-        
-        if (false !== mb_stripos($url, stripSS($this->links->name), 0, 'UTF-8')){
+        $runame = stripSS($this->links->name);
+        $enname = stripSS($this->links->nameEng);
+        if (false !== mb_stripos($url, $runame, 0, 'UTF-8')){
+            $rank += 10;
+        }
+        if(false !== mb_stripos($url, $enname, 0, 'UTF-8')) {
             $rank += 50;
         }
         
-        if(false !== mb_stripos($url, stripSS($this->links->nameEng), 0, 'UTF-8')) {
-            $rank += 50;
-        }
+        dumpIncremental("{$url}".PHP_EOL."{$enname}".PHP_EOL."{$runame}".PHP_EOL."promoted for:{$rank}".PHP_EOL, '_#ranklogName.log');
         return $rank;
     }
     
@@ -74,13 +81,7 @@ class ranker {
             "сезон",
             "сезон:",
             "сезон-",
-            "сезон - ",
-            "Cезон ",
-            "Cезон: ",
-            "Cезон",
-            "Cезон:",
-            "Cезон-",
-            "Cезон - "
+            "сезон - "
         ) as $pattern) {
         
             if (false !== mb_stripos($url , "{$pattern}{$this->links->season}", 0, 'UTF-8')){
@@ -104,7 +105,7 @@ class ranker {
     }
     
     public function rankEpisode($url) {
-    	foreach (array("серии", "серия", "Cерии", "Cерия") as $prePrePattern) {
+    	foreach (array("серии", "серия") as $prePrePattern) {
     		foreach (array(" ", ": ") as $middlePattern) {
     			foreach (array("1-", "1 - ", "1 -") as $postPattern) {
     				$prePattern = $prePrePattern.$middlePattern.$postPattern;
@@ -117,9 +118,13 @@ class ranker {
     					    dumpIncremental("{$this->links->name} for url:{$url} ranked by pre pattern {$prePattern} + {$this->links->episodeFirst}", '_#ranklogSeries.log');
     						return $this->baseRank;
     					}else {
+    					    dumpIncremental("{$this->links->name} for url:{$url} ranking by preg", '_#ranklogSeriesPreg.log');
+    					    dumpIncremental('/('.$prePattern.'[?<digit>\d+]*)/', '_#ranklogSeriesPreg.log');
     						preg_match('/('.$prePattern.'[?<digit>\d+]*)/', $url, $matches);
-    						$dd = array_map('trim', explode('-',$matches[0]));
+    						dumpIncremental(print_r($matches, 1), '_#ranklogSeriesPreg.log');
+    						$dd = array_reverse(array_map('trim', explode('-',$matches[0])));
     						$lastnum = intval($dd[0]);
+    						dumpIncremental("lastnumgot({$lastnum})", '_#ranklogSeriesPreg.log');
     						if($lastnum >= $this->links->episodeLast) {
     						    dumpIncremental("{$this->links->name} for url:{$url} ranked by preg lastnum:{$lastnum} >= {$this->links->episodeLast}", '_#ranklogSeries.log');    						
     						    return $this->baseRank;
@@ -179,6 +184,7 @@ class ranker {
             'alexfim' => $this->baseRank,
             'sienduk' => $this->baseRank*0.9,
             'amedia' => $this->baseRank*0.7,
+            'hdclub' =>  $this->baseRank*0.1
         ) as $str => $rank) {
             if(false !== mb_stripos($url , $str, 0, 'UTF-8')) {
             	return $rank;
