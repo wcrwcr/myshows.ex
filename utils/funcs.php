@@ -69,6 +69,9 @@ function stripSS($text) {
     $text = mb_str_replace("»", "", $text);
     $text = mb_str_replace("«", "", $text);
 
+    //real o'neals
+    $text = mb_str_replace("’", "", $text);
+    
     return $text;
 }
 

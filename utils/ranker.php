@@ -70,6 +70,8 @@ class ranker {
             $rank += 50;
         }
         
+        //@TODO fuzzy check
+        
         dumpIncremental("{$url}".PHP_EOL."{$enname}".PHP_EOL."{$runame}".PHP_EOL."promoted for:{$rank}".PHP_EOL, '_#ranklogName.log');
         return $rank;
     }
