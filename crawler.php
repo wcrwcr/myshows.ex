@@ -1,8 +1,17 @@
 <?php
+define ('DATE',date("d.m.y.H.i.s"));
+define('LOG', true);
+//define('LOG', false);
+
 require_once 'vendors/Loader.php';
 require_once 'utils/Loader.php';
 
-ob_start();
+define ('LOGPATH', $SETTINGS['logPath']);
+
+if (LOG) {
+    ob_start();
+}
+
 function setView($seasonEpisode, $data, $ms) {
 	//$data['crawler']['searcher']['rawData']['episodes']
 	$tmp = explode('-', $seasonEpisode);
@@ -60,16 +69,30 @@ foreach ($list as $key => &$item) {
 
     	foreach (array(true, false) as $series) {
     		foreach (array(true, false) as $ru) {
-    			foreach (array(true, false) as $last) {
-    				echo '.';
-    				$params = array($ru, $last, $series);
-    				$found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
-    				if (!is_null($found)) {
-      						
-    					break;
-    				}
-    				
-    			}
+    		    if ($series) {
+        			foreach (array(true, false) as $last) {
+        				echo '.';
+        				$params = array($ru, $last, $series);
+        				$found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
+        				
+        				if (!is_null($found)) {
+        				    dumpIncremental("got urls".var_export($found, 1), '_#ranklogPromoted.log');
+        				    
+        					break;
+        				}
+        				
+        			}
+    		    } else {
+    		        $last = 0;
+    		        echo '.';
+    		        $params = array($ru, $last, $series);
+    		        $found = call_user_func_array(array($results[$key]['crawler']['searcher'], 'search'), $params);
+    		        if (!is_null($found)) {
+    		            dumpIncremental("got urls".var_export($found, 1), '_#ranklogPromoted.log');
+    		            
+    		            break;
+    		        }
+    		    }
     		}
     	}
     
@@ -97,11 +120,11 @@ echo PHP_EOL."total serials: ".count($results). " found: {$found}".PHP_EOL;
 echo PHP_EOL."retrieving.".PHP_EOL;
 
 if (!empty ($links)) {
+    $downloader = new downloader($SETTINGS);
 	foreach($results as $item) {
 		if (!empty($item['links'])){
 			foreach ($item['links'] as $seasonEpisode => $link){
-				cliOut("retrieving {$link}");
-				execInBackground("{$SETTINGS['wgetPath']}wget {$SETTINGS['getString']}{$link} -P{$SETTINGS['storagePath']} -b");
+				$downloader->get($link);
 				setView($seasonEpisode, $item, $ms);
 				cliOut("{$item['crawler']['searcher']->rawData['ruTitle']} {$seasonEpisode} set as viewed.");
 			}
@@ -113,16 +136,17 @@ if (!empty ($links)) {
 	cliOut("nothing to retrieve.");
 }
 
-$date = date("d.m.y.H.i.s");
 
 if (!empty($notLinks)) {
-	dumpIncremental(implode(PHP_EOL, $notLinks), $SETTINGS['logPath'].$date.'_#didntRetrieved.log');	
+	dump(implode(PHP_EOL, $notLinks), '_#didntRetrieved.log');	
 	echo PHP_EOL."some of the serials was found but cant retrieve links, check _#didntRetrieved.log.".PHP_EOL;
 }
 
-$log = ob_get_contents();
-ob_end_clean();
+if (LOG) {
+    $log = ob_get_contents();
+    ob_end_clean();
+    dump($log, '.run'.'.log');
+}
 
 //echo pr($es);
-dump($results, $SETTINGS['logPath'].$date.'.debug'.'.log');
-dump($log, $SETTINGS['logPath'].$date.'.run'.'.log');
+dump($results, '.debug'.'.log');

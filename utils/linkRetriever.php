@@ -25,11 +25,16 @@ class linkRetriever {
 		for ($episode = $data->episodeLast; $episode<= $data->episodeFirst; $episode++) {
 			foreach (array(
 					"s".$this->_num($season)."e".$this->_num($episode),
-					"S".$this->_num($season)."E".$this->_num($episode)
+					"S".$this->_num($season)."E".$this->_num($episode),
+			        "e".$this->_num($episode)."s".$this->_num($season),
+			        "E".$this->_num($episode)."S".$this->_num($season)
 			 ) as $k=>$searchString) {
+			    			    
 			 	$fnd = $this->page->find("a[title*={$searchString}]", 0);
 			 	if ($fnd !== null) {
+			 	    dumpIncremental("lookforLink `{$searchString}` s{$season}e{$episode}", '_#ranklogPromoted.log');
 			 		$links[$season.'-'.$episode] = $fnd->href;
+			 		dumpIncremental("and found {$fnd->innertext} s{$season}e{$episode}", '_#ranklogPromoted.log');
 			 	}
 			 }
 		}

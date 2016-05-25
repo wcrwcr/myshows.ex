@@ -8,5 +8,7 @@ $SETTINGS = array(
 		'wgetPath' => "d:\\wget\\bin\\", //local wget path. if system allows global `wget` command leave blank
 		'storagePath' => "d:\\_crawled\\", //where media files will appear
 		'logPath' => "d:\\_crawled\\logs\\", //where logs will appear
+        'storage' => 'wget', // 'wget' or 'dmaster'
+        'dmasterPath' => "C:\\PROGRA~2\\DOWNLO~1\\"
 
 );

@@ -55,6 +55,11 @@ class searcher {
         return $this;
     }
     
+    //strips all unusual occurencies in Myshows names
+    private function stripSS($text) {
+        return stripSS($text);
+    }
+    
     public function search ($ru = true, $last = true, $series = true) {
         $ss = array();
         
@@ -64,11 +69,11 @@ class searcher {
         $this->schema .= intval($last);
         
         if ($ru) {
-            $ss[]= mb_strtolower($this->name, 'UTF-8');
+            $ss[]= mb_strtolower(stripSS($this->name), 'UTF-8');
         } else {
-            $ss[]= mb_strtolower($this->nameEng, 'UTF-8');
+            $ss[]= mb_strtolower(stripSS($this->nameEng), 'UTF-8');
         }
-
+        
         $ss[]= "сезон {$this->season}";
         
         if ($series) {
@@ -80,22 +85,44 @@ class searcher {
         }
         
         $this->searchString = implode(' ', $ss);
+        
+        //strip the specials
+        $this->searchString = str_replace("'", '', $this->searchString);
+        $this->searchString = str_replace(".", ' ', $this->searchString);
+        
         $searchString = urlencode($this->searchString);
-        $html = file_get_html('http://www.ex.ua/search?s='.$searchString);
+        dumpIncremental("lookfor {$this->searchString} with {$this->schema}", '_#ranklogPromoted.log');
+        
+        overloadErrors ();
+        try {
+            $url2Load = 'http://www.ex.ua/search?s='.$searchString;
+            $html = file_get_html($url2Load);
+        } catch (Exception $e) {
+            echo PHP_EOL."failed to load: {$url2Load}.".PHP_EOL;
+            return null;
+        }
+        overloadErrors (false);
+        
         if (is_object($html)) {
         	$links = $html->find('table.panel td a');
 		    $looker = ($ru)? $this->name : $this->nameEng ;
 		    
+		    $looker = $this->stripSS($looker);
+		    		    
         	if (is_array($links) && !empty($links)) {
 		        foreach ($links as $el) {
-		        	$text = $el->plaintext;
+		        	$text = decodeSpecials($el->plaintext);
+		            
+		        	dumpIncremental("look text {$text} for {$looker}", $this->schema.'_#linksLooker.log');
 		        	if (mb_stripos($text, $looker, 0, 'UTF-8') !== false) {
+		        	    dumpIncremental("got", $this->schema.'_#linksLooker.log');
 			            $this->urls[] = array(
 			                'href' => $el->href,
 			                'text' => mb_strtolower($el->plaintext, 'UTF-8')
 			            );
 		        	}
 		        }
+		        
 		        if (!empty($this->urls)) {
 			        $tmp = new ranker($this); 
 		        	return $tmp->rankAll();
